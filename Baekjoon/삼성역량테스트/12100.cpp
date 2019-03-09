@@ -1,92 +1,86 @@
-// [시뮬레이션 + BFS]
-// 1. 한 번의 이동은 상하좌우의 움직임이다.
-// 2. 같은 값의 블록은 충돌하면 합친다.
-// 3. 이미 합친 블록은 또 다른 블록과 합칠 수 없다.
-// 4. 블록은 추가 되지 않는다.
-// 5. 똑같은 수가 여러개 있다면 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
-// 6. 최대 5번 이동해서 얻을 수 있는 가장 큰 블록의 값을 구하여라.
-
+// [시뮬레이션 + DFS]
 #include <iostream>
 #include <queue>
-#include <algorithm>
 #include <limits.h>
-#include <cmath>
+#include <algorithm>
+using namespace std;
 
-// 1. 상하좌우의 움직임
 #define UP 0
 #define DOWN 1
 #define LEFT 2
 #define RIGHT 3
 
-using namespace std;
-
+// 5. 이 문제에서 다루는 2048 게임은 보드의 크기가 N×N 이다.
+int N;
 int board[20][20];
-int n;
-int ans = INT_MIN;
 
-// 6. 가장 큰 블록의 값을 구하여라
+int ret = INT_MIN;
+
+const int dy[] = { 0, 0, -1, 1 };
+const int dx[] = { 1, -1, 0, 0 };
+
+//  6. 최대 5번 이동해서 만들 수 있는 가장 큰 블록의 값을 구하는 프로그램을 작성하시오.
 int FindMax(){
-    for(int y = 0; y < n; ++y){
-        for(int x = 0; x < n; ++x){
-            ans = max(ans, board[y][x]);
+    for(int y = 0; y < N; ++y){
+        for(int x = 0; x < N; ++x){
+            ret = max(ret, board[y][x]);
         }
     }
-    return ans;
+    return ret;
 }
 
 void Change(int direction){
     queue<int> q;
-
-    // 4가지 방향
+    
     switch(direction){
         case UP:
-            for(int x = 0; x < n; ++x){
-                for(int y = 0; y < n; ++y){
-                    if(board[y][x] != 0){
-                        q.push(board[y][x]);    // 값을 저장한다.
-                        board[y][x] = 0;
-                    }
-                }
-
-                // 5. 똑같은 수가 여러개 있다면 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
-                int idx = 0;
-                while(!q.empty()){
-                    int block = q.front();
-                    q.pop();
-                    
-                    // 5. 똑같은 수가 여러개 있다면 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
-                    if(board[idx][x] == 0){
-                        board[idx][x] = block;
-                    }else if(board[idx][x] == block){
-                        // 2. 같은 값의 블록은 충돌하면 합친다.
-                        board[idx][x] *= 2;
-                        ++idx;
-                    }else{
-                        // 3. 이미 합친 블록은 또 다른 블록과 합칠 수 없다.
-                        board[++idx][x] = block;
-                    }
-                }
-            }
-            break;
-        case DOWN:
-            for(int x = 0; x < n; ++x){
-                for(int y = n - 1; y >= 0; --y){
+            for(int x = 0; x < N; ++x){
+                for(int y = 0; y < N; ++y){
                     if(board[y][x] != 0){
                         q.push(board[y][x]);
                         board[y][x] = 0;
                     }
                 }
 
-                int idx = n - 1;
+                int idx = 0;
                 while(!q.empty()){
-                    int block = q.front();
-                    q.pop();
+                    int block = q.front();  q.pop();
                     
+                    //  4. 똑같은 수가 세 개가 있는 경우에는 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
                     if(board[idx][x] == 0){
                         board[idx][x] = block;
+                    //  2. 이때, 같은 값을 갖는 두 블록이 충돌하면 두 블록은 하나로 합쳐지게 된다.
+                    }else if(board[idx][x] == block){
+                        board[idx][x] *= 2;
+                        ++idx;
+                    //  3. 한 번의 이동에서 이미 합쳐진 블록은 또 다른 블록과 다시 합쳐질 수 없다.
+                    }else{
+                        board[++idx][x] = block;
+                    }
+                }
+            }
+            break;
+        case DOWN:
+            for(int x = 0; x < N; ++x){
+                for(int y = N - 1; y >= 0; --y){
+                    if(board[y][x] != 0){
+                        q.push(board[y][x]);
+                        board[y][x] = 0;
+                    }
+                }
+
+                int idx = N - 1;
+                while(!q.empty()){
+                    int block = q.front();  q.pop();
+                    
+                    //  4. 똑같은 수가 세 개가 있는 경우에는 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
+                    if(board[idx][x] == 0){
+                        board[idx][x] = block;
+                    //  2. 이때, 같은 값을 갖는 두 블록이 충돌하면 두 블록은 하나로 합쳐지게 된다.
                     }else if(board[idx][x] == block){
                         board[idx][x] *= 2;
                         --idx;
+                    //  3. 한 번의 이동에서 이미 합쳐진 블록은 또 다른 블록과 다시 합쳐질 수 없다.
                     }else{
                         board[--idx][x] = block;
                     }
@@ -94,8 +88,8 @@ void Change(int direction){
             }
             break;
         case LEFT:
-            for(int y = 0; y < n; ++y){
-                for(int x = 0; x < n; ++x){
+            for(int y = 0; y < N; ++y){
+                for(int x = 0; x < N; ++x){
                     if(board[y][x] != 0){
                         q.push(board[y][x]);
                         board[y][x] = 0;
@@ -104,14 +98,16 @@ void Change(int direction){
 
                 int idx = 0;
                 while(!q.empty()){
-                    int block = q.front();
-                    q.pop();
-
+                    int block = q.front();  q.pop();
+                    
+                    //  4. 똑같은 수가 세 개가 있는 경우에는 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
                     if(board[y][idx] == 0){
-                        board[y][idx] = block;
+                        board[y][idx]= block;
+                    //  2. 이때, 같은 값을 갖는 두 블록이 충돌하면 두 블록은 하나로 합쳐지게 된다.
                     }else if(board[y][idx] == block){
                         board[y][idx] *= 2;
                         ++idx;
+                    //  3. 한 번의 이동에서 이미 합쳐진 블록은 또 다른 블록과 다시 합쳐질 수 없다.
                     }else{
                         board[y][++idx] = block;
                     }
@@ -119,24 +115,26 @@ void Change(int direction){
             }
             break;
         case RIGHT:
-            for(int y = 0; y < n; ++y){
-                for(int x = n - 1; x >= 0; --x){
+            for(int y = 0; y < N; ++y){
+                for(int x = N - 1; x >= 0; --x){
                     if(board[y][x] != 0){
                         q.push(board[y][x]);
                         board[y][x] = 0;
                     }
                 }
 
-                int idx = n - 1;
+                int idx = N - 1;
                 while(!q.empty()){
-                    int block = q.front();
-                    q.pop();
-
+                    int block = q.front();  q.pop();
+                    
+                    //  4. 똑같은 수가 세 개가 있는 경우에는 이동하려고 하는 쪽의 칸이 먼저 합쳐진다.
                     if(board[y][idx] == 0){
-                        board[y][idx] = block;
+                        board[y][idx]= block;
+                    //  2. 이때, 같은 값을 갖는 두 블록이 충돌하면 두 블록은 하나로 합쳐지게 된다.
                     }else if(board[y][idx] == block){
                         board[y][idx] *= 2;
                         --idx;
+                    //  3. 한 번의 이동에서 이미 합쳐진 블록은 또 다른 블록과 다시 합쳐질 수 없다.
                     }else{
                         board[y][--idx] = block;
                     }
@@ -147,51 +145,50 @@ void Change(int direction){
 }
 
 void DFS(int depth){
-    // 6. 최대 5번 이용하여 가장 큰 블록의 값을 구하여라
+    //  6. 최대 5번 이동해서 만들 수 있는 가장 큰 블록의 값을 구하는 프로그램을 작성하시오.
+    // 11. 최대 5번 이동시켜서 얻을 수 있는 가장 큰 블록을 출력한다.
     if(depth == 5){
-        ans = max(ans, FindMax());
-        return;
+        ret = max(ret, FindMax());
+        return ;
     }
-
-    int temp[20][20];
 
     // 현재의 상황을 temp에 저장하자
-    for(int y = 0; y < n; ++y){
-        for(int x = 0; x < n; ++x){
-            temp[y][x] = board[y][x];
+    int temp_board[20][20];
+    for(int y = 0; y < N; ++y){
+        for(int x = 0; x < N; ++x){
+            temp_board[y][x] = board[y][x];
         }
     }
-
-    // 상하좌우 한번씩 움직인다.
+    //  1. 이 게임에서 한 번의 이동은 보드 위에 있는 전체 블록을 상하좌우 네 방향 중 하나로 이동시키는 것이다. 
     for(int dir = 0; dir < 4; ++dir){
         // 상하좌우 한번씩 움직인다.
         Change(dir);
         // 움직인 횟수는 증가한다.
         DFS(depth + 1);
         // 움직이기 전 상태로 돌아온다.
-        for(int y = 0; y < n; ++y){
-            for(int x = 0; x < n; ++x){
-                board[y][x] = temp[y][x];
+        for(int y = 0; y < N; ++y){
+            for(int x = 0; x < N; ++x){
+                board[y][x] = temp_board[y][x];
             }
         }
     }
-
 }
 
 int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL),  cin.tie(NULL);
+    //  7. 첫째 줄에 보드의 크기 N (1 ≤ N ≤ 20)이 주어진다.
+    cin >> N;
 
-    cin >> n;
-
-    for(int y = 0; y < n; ++y){
-        for(int x = 0; x < n; ++x){
+    //  8. 둘째 줄부터 N개의 줄에는 게임판의 초기 상태가 주어진다.
+    //  9. 0은 빈 칸을 나타내며, 이외의 값은 모두 블록을 나타낸다. 
+    // 10. 블록에 쓰여 있는 수는 2보다 크거나 같고, 1024보다 작거나 같은 2의 제곱꼴이다. 블록은 적어도 하나 주어진다.
+    for(int y = 0; y < N; ++y){
+        for(int x = 0; x < N; ++x){
             cin >> board[y][x];
         }
     }
+
     DFS(0);
 
-    cout << ans << "\n";
-
+    cout << ret << "\n";
     return 0;
 }
