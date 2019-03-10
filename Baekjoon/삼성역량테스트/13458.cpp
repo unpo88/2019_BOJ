@@ -1,43 +1,49 @@
-// 1. ������ �����忡 �Ѱ������� ���� 1��
-// 2. �ΰ������� ������
-// 3. �����帶�� ���û����� ��� �����ؾ��Ѵ�.
-// 4. ������ ���� �ּҰ�
-
+// [시뮬레이션 + BFS]
 #include <iostream>
 using namespace std;
 
-const int MAX = 1000000;
+// 1. 총 N개의 시험장이 있고, 각각의 시험장마다 응시자들이 있다. i번 시험장에 있는 응시자의 수는 Ai명이다.
+int N;
+int A[1000000];
 
-int N; //���� ��
+// 2. 감독관은 총감독관과 부감독관으로 두 종류가 있다. 
+// 3. 총감독관은 한 방에서 감시할 수 있는 응시자의 수가 B명이고, 부감독관은 한 방에서 감시할 수 있는 응시자의 수가 C명이다.
+int B, C;
 
-int A[MAX]; //���� �� �л� ��
-
-int B, C; //�Ѱ�����, �ΰ�����
-
-long long minSupervisor(void) {
-	long long total = 0;
-	for (int i = 0; i < N; i++) {
-		A[i] -= B; //�Ѱ������� ������ �� �ִ� �л� ����ŭ ����
-		total++;
-		//���� �л����� ����� �ΰ������� �����ؾ��ϴ°�
-		if (A[i] > 0)
-			total += (A[i] % C == 0) ? (A[i] / C) : (A[i] / C + 1);
-	}
-	return total;
+long long result(){
+    long long ret = 0;
+    // 4. 각각의 시험장에 총감독관은 오직 1명만 있어야 하고, 부감독관은 여러 명 있어도 된다.
+    for(int i = 0; i < N; ++i){
+        A[i] -= B;
+        ret += 1;
+        if(A[i] > 0){
+            if(A[i] % C == 0){
+            ret += A[i] / C;
+            }else{
+                ret += A[i] / C + 1;
+            }
+        }
+    }
+    return ret;
 }
 
-int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL), cout.tie(NULL);
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL),  cout.tie(NULL);
 
-	cin >> N;
+    // 6. 첫째 줄에 시험장의 개수 N(1 ≤ N ≤ 1,000,000)이 주어진다.
+    cin >> N;
 
-	for (int i = 0; i < N; i++)
-		cin >> A[i];
+    // 7. 둘째 줄에는 각 시험장에 있는 응시자의 수 Ai (1 ≤ Ai ≤ 1,000,000)가 주어진다.
+    for(int i = 0; i < N; ++i){
+        cin >> A[i];
+    }
 
-	cin >> B >> C;
-	
-	cout << minSupervisor() << endl;
+    // 8. 셋째 줄에는 B와 C가 주어진다. (1 ≤ B, C ≤ 1,000,000)
+    cin >> B >> C;
 
-	return 0;
+    // 5. 각 시험장마다 응시생들을 모두 감시해야 한다. 이때, 필요한 감독관 수의 최솟값을 구하는 프로그램을 작성하시오.
+    // 9. 각 시험장마다 응시생을 모두 감독하기 위해 필요한 감독관의 최소 수를 출력한다.
+    cout << result() << "\n";
+    return 0;
 }
