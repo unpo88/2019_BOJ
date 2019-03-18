@@ -14,7 +14,7 @@ vector<pair<int, int> > chicken;
 
 int answer = INT_MAX;
 
-void BFS(int idx, int cnt) {
+void DFS(int idx, int cnt) {
 	if (idx > chicken.size())	return;
 
 	if (cnt == M) {
@@ -37,7 +37,7 @@ void BFS(int idx, int cnt) {
     for(int i = idx; i < chicken.size(); i++){
         if(check[i] == false){
             check[i] = true;
-            BFS(i, cnt + 1);
+            DFS(i, cnt + 1);
             check[i] = false;
         }
     }
@@ -62,7 +62,7 @@ int main() {
 		}
 	}
 
-	BFS(0, 0);
+	DFS(0, 0);
 
 	cout << answer << endl;
 
