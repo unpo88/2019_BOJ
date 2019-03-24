@@ -253,63 +253,51 @@
 
 //     cout << solve() << "\n";
 // }
-
-#include<iostream>
-#include<algorithm>
-#include<vector>
- 
-#define endl "\n"
-#define MAX 11
+#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
- 
+
 int N, M, K;
-int Energy[MAX][MAX];
-int Insert_Energy[MAX][MAX];
- 
-vector<int> MAP[MAX][MAX];
- 
+int map[11][11],    A[11][11];
+
+vector<int> MAP[11][11];
+
 const int dy[] = { -1, -1, -1,  0,  0, +1, +1, +1 };
 const int dx[] = { -1,  0, +1, -1, +1, -1,  0, +1 };
- 
-void Input()
-{
+
+void Input(){
     cin >> N >> M >> K;
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            cin >> Insert_Energy[i][j];
-            Energy[i][j] = 5;
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            cin >> A[y][x];
+            map[y][x] = 5;
         }
     }
-    
-    for (int i = 0; i < M; i++)
-    {
-        int a, b, c;
-        cin >> a >> b >> c;
-        MAP[a][b].push_back(c);
+
+    for(int i = 0; i < M; ++i){
+        int y, x, z;
+        cin >> y >> x >> z;
+        MAP[y][x].push_back(z);
     }
 }
- 
-void SpringAndSummer()
-{
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            if (MAP[i][j].size() == 0) continue;
+
+void SpringAndSummer(){
+    for (int y = 1; y <= N; ++y){
+        for (int x = 1; x <= N; ++x){
+            if (MAP[y][x].size() == 0) continue;
             
             int Die_Tree_Energy = 0;
             vector<int> Temp;
  
-            sort(MAP[i][j].begin(), MAP[i][j].end());
-            for (int k = 0; k < MAP[i][j].size(); k++)
+            sort(MAP[y][x].begin(), MAP[y][x].end());
+            for (int i = 0; i < MAP[y][x].size(); i++)
             {
-                int Age = MAP[i][j][k];
+                int Age = MAP[y][x][i];
  
-                if (Energy[i][j] >= Age)
+                if (map[y][x] >= Age)
                 {
-                    Energy[i][j] = Energy[i][j] - Age;
+                    map[y][x] = map[y][x] - Age;
                     Temp.push_back(Age + 1);
                 }
                 else
@@ -318,92 +306,72 @@ void SpringAndSummer()
                 }
             }
  
-            MAP[i][j].clear();
-            for (int k = 0; k < Temp.size(); k++)
+            MAP[y][x].clear();
+            for (int i = 0; i < Temp.size(); ++i)
             {
-                MAP[i][j].push_back(Temp[k]);
+                MAP[y][x].push_back(Temp[i]);
             }
-            Energy[i][j] = Energy[i][j] + Die_Tree_Energy;
+            map[y][x] = map[y][x] + Die_Tree_Energy;
         }
     }    
 }
 
-void Fall()
-{
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            if (MAP[i][j].size() == 0) continue;
- 
-            for (int k = 0; k < MAP[i][j].size(); k++)
-            {
-                int Age = MAP[i][j][k];
- 
-                if (Age % 5 == 0)
-                {
-                    for (int a = 0; a < 8; a++)
-                    {
-                        int nx = i + dx[a];
-                        int ny = j + dy[a];
- 
-                        if (nx >= 1 && ny >= 1 && nx <= N && ny <= N)
-                        {
-                            MAP[nx][ny].push_back(1);
-                        }
+void Fall(){
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            if(MAP[y][x].size() == 0)   continue;
+            for(int i = 0; i < MAP[y][x].size(); ++i){
+                if(MAP[y][x][i] % 5 == 0){
+                    for(int dir = 0; dir < 8; ++dir){
+                        int next_y = y + dy[dir];
+                        int next_x = x + dx[dir];
+
+                        if(next_y >= 1 && next_y <= N &&
+                           next_x >= 1 && next_x <= N){
+                               MAP[next_y][next_x].push_back(1);
+                           }
                     }
                 }
             }
         }
     }
 }
- 
-void Winter()
-{
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            Energy[i][j] = Energy[i][j] + Insert_Energy[i][j];
+
+void Winter(){
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            map[y][x] = map[y][x] + A[y][x];
         }
     }
 }
- 
-void Solution()
-{
-    for (int i = 0; i < K; i++)
-    {
+
+void Solution(){
+    for(int i = 0; i < K; ++i){
         SpringAndSummer();
         Fall();
         Winter();
     }
- 
+
     int Answer = 0;
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-        {
-            Answer = Answer + MAP[i][j].size();
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            Answer = Answer + MAP[y][x].size();
         }
     }
- 
+
     cout << Answer << endl;
 }
- 
-void Solve()
-{
+
+void Solve(){
     Input();
     Solution();
 }
- 
-int main(void)
-{
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
- 
-    //freopen("Input.txt", "r", stdin);
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL),  cout.tie(NULL);
+
     Solve();
- 
+
     return 0;
 }
