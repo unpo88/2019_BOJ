@@ -165,91 +165,245 @@
 //     cout << tree[next].size() + new_tree.size() << "\n";
 
 //     return 0;
+// // }
+
+// #include <iostream>
+// #include <list>
+// using namespace std;
+
+// struct TREE{
+//     int y, x, age;
+//     bool alive;
+// };
+
+// int N, M, K;
+
+// int F[10][10],    A[10][10];
+
+// list<TREE> Trees;
+
+// const int dy[] = { -1, -1, -1,  0,  0, +1, +1, +1 };
+// const int dx[] = { -1,  0, +1, -1, +1, -1,  0, +1 };
+
+// int solve(){
+//     for(int i = 0; i < K; ++i){
+//         for(list<TREE>::iterator it = Trees.begin(); it!= Trees.end(); ++it){
+//             if(it->age <= F[it->y][it->x]){
+//                 F[it->y][it->x] -= it->age;
+//                 it->age++;
+//             }else{
+//                 it->alive = false;
+//             }
+//         }
+
+//         for(list<TREE>::iterator it = Trees.begin(); it != Trees.end();){
+//             if(it->alive){
+//                 ++it;
+//             }else{
+//                 F[it->y][it->x] += (it->age / 2);
+//                 it = Trees.erase(it);
+//             }
+//         }
+
+//         for(list<TREE>::iterator it = Trees.begin(); it != Trees.end(); ++it){
+//             if(it->age % 5 == 0){
+//                 for(int dir = 0; dir < 8; ++dir){
+//                     TREE next;
+//                     next.y = it->y + dy[dir];
+//                     next.x = it->x + dx[dir];
+//                     next.age = 1;
+//                     next.alive = true;
+//                     if(next.y < 0 || next.y >= N ||
+//                        next.x < 0 || next.x >= N){
+//                            continue;
+//                     }
+//                     Trees.push_front(next);
+//                 }
+//             }
+//         }
+
+//         for(int y = 0; y < N; ++y){
+//             for(int x = 0; x < N; ++x){
+//                 F[y][x] += A[y][x];
+//             }
+//         }
+//     }
+    
+//     return Trees.size();
 // }
 
-#include <iostream>
-#include <list>
+
+// int main(){
+//     cin >> N >> M >> K;
+
+//     for(int y = 0; y < N; ++y){
+//         for(int x = 0; x < N; ++x){
+//             cin >> A[y][x];
+//             F[y][x] = 5;
+//         }
+//     }
+
+//     TREE start;
+//     for(int i = 0; i < M; ++i){
+//         cin >> start.y >> start.x >> start.age;
+//         start.y--,  start.x--;
+//         start.alive = true;
+//         Trees.push_back(start);
+//     }
+
+//     cout << solve() << "\n";
+// }
+
+#include<iostream>
+#include<algorithm>
+#include<vector>
+ 
+#define endl "\n"
+#define MAX 11
 using namespace std;
-
-struct TREE{
-    int y, x, age;
-    bool alive;
-};
-
+ 
 int N, M, K;
-
-int F[10][10],    A[10][10];
-
-list<TREE> Trees;
-
+int Energy[MAX][MAX];
+int Insert_Energy[MAX][MAX];
+ 
+vector<int> MAP[MAX][MAX];
+ 
 const int dy[] = { -1, -1, -1,  0,  0, +1, +1, +1 };
 const int dx[] = { -1,  0, +1, -1, +1, -1,  0, +1 };
-
-int solve(){
-    for(int i = 0; i < K; ++i){
-        for(list<TREE>::iterator it = Trees.begin(); it!= Trees.end(); ++it){
-            if(it->age <= F[it->y][it->x]){
-                F[it->y][it->x] -= it->age;
-                it->age++;
-            }else{
-                it->alive = false;
-            }
-        }
-
-        for(list<TREE>::iterator it = Trees.begin(); it != Trees.end();){
-            if(it->alive){
-                ++it;
-            }else{
-                F[it->y][it->x] += (it->age / 2);
-                it = Trees.erase(it);
-            }
-        }
-
-        for(list<TREE>::iterator it = Trees.begin(); it != Trees.end(); ++it){
-            if(it->age % 5 == 0){
-                for(int dir = 0; dir < 8; ++dir){
-                    TREE next;
-                    next.y = it->y + dy[dir];
-                    next.x = it->x + dx[dir];
-                    next.age = 1;
-                    next.alive = true;
-                    if(next.y < 0 || next.y >= N ||
-                       next.x < 0 || next.x >= N){
-                           continue;
-                    }
-                    Trees.push_front(next);
-                }
-            }
-        }
-
-        for(int y = 0; y < N; ++y){
-            for(int x = 0; x < N; ++x){
-                F[y][x] += A[y][x];
-            }
+ 
+void Input()
+{
+    cin >> N >> M >> K;
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            cin >> Insert_Energy[i][j];
+            Energy[i][j] = 5;
         }
     }
     
-    return Trees.size();
+    for (int i = 0; i < M; i++)
+    {
+        int a, b, c;
+        cin >> a >> b >> c;
+        MAP[a][b].push_back(c);
+    }
+}
+ 
+void SpringAndSummer()
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            if (MAP[i][j].size() == 0) continue;
+            
+            int Die_Tree_Energy = 0;
+            vector<int> Temp;
+ 
+            sort(MAP[i][j].begin(), MAP[i][j].end());
+            for (int k = 0; k < MAP[i][j].size(); k++)
+            {
+                int Age = MAP[i][j][k];
+ 
+                if (Energy[i][j] >= Age)
+                {
+                    Energy[i][j] = Energy[i][j] - Age;
+                    Temp.push_back(Age + 1);
+                }
+                else
+                {
+                    Die_Tree_Energy = Die_Tree_Energy + (Age / 2);
+                }
+            }
+ 
+            MAP[i][j].clear();
+            for (int k = 0; k < Temp.size(); k++)
+            {
+                MAP[i][j].push_back(Temp[k]);
+            }
+            Energy[i][j] = Energy[i][j] + Die_Tree_Energy;
+        }
+    }    
 }
 
-
-int main(){
-    cin >> N >> M >> K;
-
-    for(int y = 0; y < N; ++y){
-        for(int x = 0; x < N; ++x){
-            cin >> A[y][x];
-            F[y][x] = 5;
+void Fall()
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            if (MAP[i][j].size() == 0) continue;
+ 
+            for (int k = 0; k < MAP[i][j].size(); k++)
+            {
+                int Age = MAP[i][j][k];
+ 
+                if (Age % 5 == 0)
+                {
+                    for (int a = 0; a < 8; a++)
+                    {
+                        int nx = i + dx[a];
+                        int ny = j + dy[a];
+ 
+                        if (nx >= 1 && ny >= 1 && nx <= N && ny <= N)
+                        {
+                            MAP[nx][ny].push_back(1);
+                        }
+                    }
+                }
+            }
         }
     }
-
-    TREE start;
-    for(int i = 0; i < M; ++i){
-        cin >> start.y >> start.x >> start.age;
-        start.y--,  start.x--;
-        start.alive = true;
-        Trees.push_back(start);
+}
+ 
+void Winter()
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            Energy[i][j] = Energy[i][j] + Insert_Energy[i][j];
+        }
     }
-
-    cout << solve() << "\n";
+}
+ 
+void Solution()
+{
+    for (int i = 0; i < K; i++)
+    {
+        SpringAndSummer();
+        Fall();
+        Winter();
+    }
+ 
+    int Answer = 0;
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            Answer = Answer + MAP[i][j].size();
+        }
+    }
+ 
+    cout << Answer << endl;
+}
+ 
+void Solve()
+{
+    Input();
+    Solution();
+}
+ 
+int main(void)
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+ 
+    //freopen("Input.txt", "r", stdin);
+    Solve();
+ 
+    return 0;
 }
