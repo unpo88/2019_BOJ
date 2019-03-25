@@ -1,3 +1,123 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int N, M, K;
+int F[11][11],  A[11][11];
+
+vector<int> map[11][11];
+
+const int dy[] = { -1, -1, -1,  0,  0, +1, +1, +1 };
+const int dx[] = { -1,  0, +1, -1, +1, -1,  0, +1 };
+
+void input(){
+    // 첫째 줄에 N, M, K가 주어진다.
+    cin >> N >> M >> K;
+
+    // 둘째 줄부터 N개의 줄에 A배열의 값이 주어진다.
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            cin >> A[y][x];
+            F[y][x] = 5;
+        }
+    }
+
+    for(int i = 0; i < M; ++i){
+        int y, x, z;
+        cin >> y >> x >> z;
+        map[y][x].push_back(z);
+    }
+}
+
+void spring_summer(){
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            if(map[y][x].size() == 0)   continue;
+
+            // 나이가 어린 나무부터 양분을 먹는다.
+            sort(map[y][x].begin(), map[y][x].end());
+            vector<int> Temp;
+            int Die_Tree = 0;
+
+            for(int i = 0; i < map[y][x].size(); ++i){
+                // 봄에는 나무가 자신의 나이만큼 양분을 먹고, 나이가 1 증가한다.
+                if(map[y][x][i] <= F[y][x]){
+                    F[y][x] -= map[y][x][i];
+                    map[y][x][i] += 1;
+                    Temp.push_back(map[y][x][i]);
+                }else{  // 양분이 부족해 자신의 나이만큼 양분을 먹을 수 없는 나무는 양분을 먹지 못하고 즉시 죽는다.
+                    // 죽은 나무가 양분으로 변하게 된다. 각각의 죽은 나무마다 나이를 2로 나눈 값이 나무가 있던 칸에 양분으로 추가된다.
+                    Die_Tree += (map[y][x][i] / 2);    
+                }
+            }
+            
+            map[y][x].clear();
+            for(int i = 0; i < Temp.size(); ++i){
+                map[y][x].push_back(Temp[i]);
+            }
+            F[y][x] += Die_Tree;
+        }
+    }
+}
+
+void fall(){
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            if(map[y][x].size() == 0)   continue;
+            for(int i = 0; i < map[y][x].size(); ++i){
+                if(map[y][x][i] % 5 == 0){
+                    for(int dir = 0; dir < 8; ++dir){
+                        int next_y = y + dy[dir];
+                        int next_x = x + dx[dir];
+                        if(next_y >= 1 && next_y <= N 
+                        && next_x >= 1 && next_x <= N){
+                            map[next_y][next_x].push_back(1);
+                        }
+                    }   
+                }
+            }
+        }
+    }
+}
+
+void winter(){
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            F[y][x] += A[y][x];
+        }
+    }
+}
+
+
+void solution(){
+    for(int i = 0; i < K; ++i){
+        spring_summer();
+        fall();
+        winter();
+    }
+
+    int Answer = 0;
+
+    for(int y = 1; y <= N; ++y){
+        for(int x = 1; x <= N; ++x){
+            Answer += map[y][x].size();
+        }
+    }
+
+    cout << Answer << "\n";
+}
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL),  cout.tie(NULL);
+
+    input();
+    solution();
+
+    return 0;
+}
+
 // #include <iostream>
 // #include <queue>
 // #include <algorithm>
@@ -253,125 +373,3 @@
 
 //     cout << solve() << "\n";
 // }
-#include <iostream>
-#include <vector>
-#include <algorithm>
-using namespace std;
-
-int N, M, K;
-int map[11][11],    A[11][11];
-
-vector<int> MAP[11][11];
-
-const int dy[] = { -1, -1, -1,  0,  0, +1, +1, +1 };
-const int dx[] = { -1,  0, +1, -1, +1, -1,  0, +1 };
-
-void Input(){
-    cin >> N >> M >> K;
-    for(int y = 1; y <= N; ++y){
-        for(int x = 1; x <= N; ++x){
-            cin >> A[y][x];
-            map[y][x] = 5;
-        }
-    }
-
-    for(int i = 0; i < M; ++i){
-        int y, x, z;
-        cin >> y >> x >> z;
-        MAP[y][x].push_back(z);
-    }
-}
-
-void SpringAndSummer(){
-    for (int y = 1; y <= N; ++y){
-        for (int x = 1; x <= N; ++x){
-            if (MAP[y][x].size() == 0) continue;
-            
-            int Die_Tree_Energy = 0;
-            vector<int> Temp;
- 
-            sort(MAP[y][x].begin(), MAP[y][x].end());
-            for (int i = 0; i < MAP[y][x].size(); i++)
-            {
-                int Age = MAP[y][x][i];
- 
-                if (map[y][x] >= Age)
-                {
-                    map[y][x] = map[y][x] - Age;
-                    Temp.push_back(Age + 1);
-                }
-                else
-                {
-                    Die_Tree_Energy = Die_Tree_Energy + (Age / 2);
-                }
-            }
- 
-            MAP[y][x].clear();
-            for (int i = 0; i < Temp.size(); ++i)
-            {
-                MAP[y][x].push_back(Temp[i]);
-            }
-            map[y][x] = map[y][x] + Die_Tree_Energy;
-        }
-    }    
-}
-
-void Fall(){
-    for(int y = 1; y <= N; ++y){
-        for(int x = 1; x <= N; ++x){
-            if(MAP[y][x].size() == 0)   continue;
-            for(int i = 0; i < MAP[y][x].size(); ++i){
-                if(MAP[y][x][i] % 5 == 0){
-                    for(int dir = 0; dir < 8; ++dir){
-                        int next_y = y + dy[dir];
-                        int next_x = x + dx[dir];
-
-                        if(next_y >= 1 && next_y <= N &&
-                           next_x >= 1 && next_x <= N){
-                               MAP[next_y][next_x].push_back(1);
-                           }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void Winter(){
-    for(int y = 1; y <= N; ++y){
-        for(int x = 1; x <= N; ++x){
-            map[y][x] = map[y][x] + A[y][x];
-        }
-    }
-}
-
-void Solution(){
-    for(int i = 0; i < K; ++i){
-        SpringAndSummer();
-        Fall();
-        Winter();
-    }
-
-    int Answer = 0;
-    for(int y = 1; y <= N; ++y){
-        for(int x = 1; x <= N; ++x){
-            Answer = Answer + MAP[y][x].size();
-        }
-    }
-
-    cout << Answer << endl;
-}
-
-void Solve(){
-    Input();
-    Solution();
-}
-
-int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL),  cout.tie(NULL);
-
-    Solve();
-
-    return 0;
-}
