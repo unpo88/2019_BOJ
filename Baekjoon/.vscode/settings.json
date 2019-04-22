@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "tuple": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "limits": "cpp",
+        "iostream": "cpp"
+    }
+}
