@@ -43,34 +43,37 @@ int main() {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	
-	cin >> N >> L;
+    int T;
+    cin >> T;
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cin >> map[i][j];
-		}
-	}
+    for(int tc = 1; tc <= T; ++tc){
+        cin >> N >> L;
+        int ans = 0;
 
-	int ans = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                cin >> map[i][j];
+            }
+        }
 
-	for (int i = 0; i < N; i++) {
-		vector<int> d;
-		for (int j = 0; j < N; j++) {
-			d.push_back(map[i][j]);
-		}
-		if (go(d, L))    ans += 1;
-	}
+        for (int i = 0; i < N; i++) {
+            vector<int> d;
+            for (int j = 0; j < N; j++) {
+                d.push_back(map[i][j]);
+            }
+            if (go(d, L))    ans += 1;
+        }
 
-	for (int j = 0; j < N; j++) {
-		vector<int> d;
-		for (int i = 0; i < N; i++) {
-			d.push_back(map[i][j]);
-		}
-		if (go(d, L))    ans += 1;
-	}
+        for (int j = 0; j < N; j++) {
+            vector<int> d;
+            for (int i = 0; i < N; i++) {
+                d.push_back(map[i][j]);
+            }
+            if (go(d, L))    ans += 1;
+        }
 
-	cout << ans << '\n';
-
+        cout << "#" << tc << " " << ans << '\n';
+    }
 
 	return 0;
 }
