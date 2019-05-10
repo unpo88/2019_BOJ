@@ -1,79 +1,64 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
 int N, L;
+int answer;
+int map[40][20];
 
-int map[101][101];
-
-bool go(vector<int> &a, int l) {
-	int n = a.size();
-
-	vector<bool> c(n, false);
-	
-	for (int i = 1; i < n; i++) {
-		if (a[i - 1] != a[i]) {
-			int diff = a[i] - a[i - 1];
-			if (diff < 0)    diff *= -1;
-			if (diff != 1)   return false;
-			if (a[i - 1] < a[i]) {
-				for (int j = 1; j <= l; j++) {
-					if (i - j < 0)   return false;
-					if (a[i - 1] != a[i - j])    return false;
-					if (c[i - j])  return false;
-					c[i - j] = true;
-				}
-			}
-			else {
-				for (int j = 0; j < l; j++) {
-					if (i + j >= n)    return false;
-					if (a[i] != a[i + j])  return false;
-					if (c[i + j])  return false;
-					c[i + j] = true;
-				}
-			}
-		}
-	}
-	return true;
+void init(){
+    answer = 0;
+    for(int y = 0; y < 41; ++y){
+        for(int x = 0; x < 21; ++x){
+            map[y][x] = 0;
+        }
+    }
 }
 
-int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL);
-	cout.tie(NULL);
-	
+int main()
+{
     int T;
     cin >> T;
 
     for(int tc = 1; tc <= T; ++tc){
+        init();
+
         cin >> N >> L;
-        int ans = 0;
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                cin >> map[i][j];
+        for (int y = 0; y < N; ++y) {
+            for (int x = 0; x < N; ++x) {
+                cin >> map[y][x];
             }
         }
 
-        for (int i = 0; i < N; i++) {
-            vector<int> d;
-            for (int j = 0; j < N; j++) {
-                d.push_back(map[i][j]);
+        for (int y = 0; y < N; ++y) {
+            for (int x = 0; x < N; ++x) {
+                map[N + y][x] = map[x][y];
             }
-            if (go(d, L))    ans += 1;
         }
 
-        for (int j = 0; j < N; j++) {
-            vector<int> d;
-            for (int i = 0; i < N; i++) {
-                d.push_back(map[i][j]);
-            }
-            if (go(d, L))    ans += 1;
-        }
+        int count = 0;
+        int i, j;
 
-        cout << "#" << tc << " " << ans << '\n';
+        for (i = 0; i < 2 * N; ++i) {
+            count = 1;
+            for (j = 0; j < N - 1; ++j) {
+                if (map[i][j] == map[i][j + 1]) {
+                    ++count;
+                }
+                else if (map[i][j] + 1 == map[i][j + 1] && count >= L) {
+                    count = 1;
+                }
+                else if (map[i][j] - 1 == map[i][j + 1] && count >= 0) {
+                    count = (1 - L);
+                }
+                else {
+                    break;
+                }
+            }
+            if (j == (N - 1) && count >= 0) {
+                ++answer;
+            }
+        }
+        cout << "#" << tc << " " << answer << "\n";
     }
-
 	return 0;
 }
