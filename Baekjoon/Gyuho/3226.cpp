@@ -11,27 +11,37 @@ int main() {
 
 	char s[6];
 	int n;
-	int charge;
 
 	int sum = 0;
 	while (N--) {
 		for (int i = 0; i < 5; i++) {
 			cin >> s[i];
 		}
+
 		cin >> n;
 
 		int hour, minute;
 		hour = (s[0] - '0') * 10 + (s[1] - '0');
 		minute = (s[3] - '0') * 10 + (s[4] - '0');
 
-		if (hour >= 7 && hour <= 19) {
-			charge = 10;
-		}
-		else if (hour >= 19 && hour <= 7) {
-			charge = 5;
-		}
+		while (n--) {
 
-		sum += n * charge;
+			if (hour >= 7 && hour < 19) {
+				sum += 10;
+			}
+			else {
+				sum += 5;
+			}
+
+			minute += 1;
+			if (minute == 60) {
+				hour += 1;
+				if (hour == 24) {
+					hour = 0;
+				}
+				minute = 0;
+			}
+		}
 	}
 
 	cout << sum << "\n";

@@ -5,16 +5,14 @@ int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL), cout.tie(NULL);
 
-	long long Q;
-	cin >> Q;
+	int L, P;
+	cin >> L >> P;
 
-	while (Q--) {
-		int n;
-		cin >> n;
-		if (n & (n - 1))
-			cout << "0\n";
-		else
-			cout << "1\n";
+	int answer = L * P;
+	for (int i = 0; i < 5; i++) {
+		int num;
+		cin >> num;
+		cout << num - answer << " ";
 	}
 
 	return 0;
