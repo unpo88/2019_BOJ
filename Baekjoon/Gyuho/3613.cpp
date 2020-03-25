@@ -1,34 +1,56 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
-#include <vector>
+
 using namespace std;
 
-int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL), cout.tie(NULL);
+int main()
+{
+	string str;
 
-	string s;
-	cin >> s;
+	cin >> str;
 
-	vector<char> v;
-	for (int i = 0; i < s.size(); i++) {
-		if (s[i] == '_') {
-			v.push_back(s[i + 1] - 32);
-			i++;
+	int len = str.size();
+
+	bool error = false;
+	bool java = false;
+	bool cpp = false;
+
+	string tmp = "";
+	
+	if (('A' <= str[0] && str[0] <= 'Z') || str[0] == '_')
+		error = true;
+	for (int i = 0; i < len; i++)
+	{
+		if (str[i] == '_')
+		{
+			if (i + 1 < len && ('a' <= str[i + 1] && str[i + 1] <= 'z'))
+			{
+				i++;
+				tmp += (str[i] - 'a' + 'A');
+				java = true;
+			}
+			else
+				error = true;
 		}
-		else if (s[i] >= 65 && s[i] <= 90) {
-			v.push_back('_');
-			cout << s[i + 1] << " " << s[i + 1] + 32;
-			v.push_back(s[i + 1] + 32);
+
+		else if ('A' <= str[i] && str[i] <= 'Z')
+		{
+			tmp += '_';
+			tmp += (str[i] - 'A' + 'a');
+			cpp = true;
 		}
-		else {
-			v.push_back(s[i]);
-		}
+
+		else
+			tmp += str[i];
 	}
 
-	for (int i = 0; i < v.size(); i++) {
-		cout << v[i];
-	}
+	if (error)
+		cout << "Error!" << endl;
+	else if (java && cpp)
+		cout << "Error!" << endl;
+	else
+		cout << tmp << endl;
 
 	return 0;
 }
